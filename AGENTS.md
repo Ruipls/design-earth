@@ -303,11 +303,97 @@ Design Earth 是一个以 3D 地球为主入口的全球设计资产探索产品
 ## 合并顺序和流程
 
 ```
-1. Agent A 完成 → PR → 合并到 main
-2. Agent B rebase main → 解决冲突 → PR → 合并
-3. Agent C rebase main → 解决冲突 → PR → 合并
-4. 集成测试 → 修复联动问题
+1. Agent A 完成 → PR → 合并到 main  ✅ 已完成 (2026-04-30)
+2. Agent B rebase main → 解决冲突 → PR → 合并  ✅ 已完成 (2026-04-30)
+3. Agent C rebase main → 解决冲突 → PR → 合并  ✅ 已完成 (2026-04-30)
+4. 集成测试 → 修复联动问题  ← 当前阶段
 ```
 
 每个 agent 完成后运行 `npx tsc --noEmit && npx vite build` 确保编译通过。
+
+---
+
+## Agent D：集成测试 + 缺陷修复（当前阶段）
+
+> **角色定位：** 执行层 Agent。负责发现并修复三个 feature branch 合并后的联动问题。
+> **顾问：** Claude Code（项目专家），遇到架构决策或方向性问题时，在 PR description 或 issue 中 @mention，由用户转达给顾问。
+> **分支：** `fix/integration`
+
+### 当前 main 分支状态（2026-04-30）
+
+| 文件 | 状态 |
+|------|------|
+| `src/components/globe/*` | ✅ Agent A 实现完毕 |
+| `src/components/hud/*` | ✅ Agent B 实现完毕 |
+| `src/components/panels/AssetDetailPanel.tsx` | ✅ Agent B 实现完毕 |
+| `src/components/panels/RightSidebar.tsx` | ✅ Agent B 实现完毕 |
+| `src/components/panels/GalleryView.tsx` | ✅ Agent C 实现完毕 |
+| `src/components/panels/TimelineView.tsx` | ✅ Agent C 实现完毕 |
+| `src/index.css` | ✅ 包含所有视图样式 |
+| `tsc --noEmit` | ✅ 通过 |
+| `vite build` | ✅ 通过（377KB gzip） |
+
+### 已知需要验证的联动点
+
+以下是三个 agent 合并后最可能出现问题的接缝，Agent D 需要逐一验证并修复：
+
+1. **筛选 ↔ 地球联动**
+   - `useFilterStore` 变化时，FarTierDots / MidTierThumbnails / NearTierCards 是否正确响应
+   - CategoryFilter 药丸点击后地球上的点是否实时更新
+
+2. **详情面板 ↔ flyTo 联动**
+   - 点击地球上的 NearTierCards → `useUIStore.selectAsset()` → AssetDetailPanel 打开
+   - AssetDetailPanel 打开时 `useGlobeStore.setCameraTarget()` 是否触发 CameraController 的 flyTo
+   - flyTo 期间 OrbitControls 是否正确禁用
+
+3. **视图切换 ↔ Canvas resize**
+   - Globe → Gallery：`GlobeCanvas` 容器是否切换到 `is-panel-mode`（30vw）
+   - Gallery → Globe：是否正确还原到 `is-globe-mode`（100vw）
+   - 切换时 Three.js renderer 是否自动 resize（R3F 默认处理，但需确认）
+
+4. **RightSidebar ↔ visibleAssetIds**
+   - `useGlobeStore.visibleAssetIds` 是否被 FarTierDots / MidTierThumbnails / NearTierCards 正确写入
+   - RightSidebar 的国家排行是否随地球旋转实时更新
+
+5. **YearRangeSlider ↔ TimelineView 同步**
+   - 拖动年份滑杆时，TimelineView 的可见资产是否同步过滤
+   - 两者都读 `useFilterStore.yearRange`，应该自动同步，但需确认
+
+6. **LoadingScreen 消失时机**
+   - `useAssetStore.loading` 变为 false 后 LoadingScreen 是否正确淡出
+
+### Agent D 工作流程
+
+```bash
+# 1. 创建修复分支
+git checkout main && git pull origin main
+git checkout -b fix/integration
+
+# 2. 启动开发服务器，手动测试上述 6 个联动点
+npm run dev
+
+# 3. 发现问题 → 修复 → 提交
+# 每个独立问题单独 commit，commit message 格式：
+# fix: <问题描述> — <修复方式>
+
+# 4. 编译验证
+npx tsc --noEmit && npx vite build
+
+# 5. 提 PR
+gh pr create --title "fix: integration issues after A/B/C merge" --body "..."
+```
+
+### 修复原则
+
+- **不要重构**，只修复联动问题
+- **不要改接口**，store 的字段和类型不变
+- 如果发现某个 agent 的实现有根本性问题，在 PR description 中描述，等顾问决策
+- 修复范围：bug fix only，不加新功能
+
+### 顾问沟通机制
+
+遇到以下情况时，在 PR description 中写明问题，用户会转达给 Claude Code 顾问：
+- 修复方案有多种选择，不确定哪种更好
+- 发现某个 agent 的实现与规格有较大偏差
+- 需要修改 store 接口才能解决问题
 
