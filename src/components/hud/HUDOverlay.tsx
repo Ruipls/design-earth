@@ -1,13 +1,39 @@
-/**
- * HUD overlay container. Fixed position over the 3D canvas.
- * pointer-events: none on the container, auto on child controls.
- * Agent B will build out all HUD components here.
- */
+import AssetDetailPanel from '../panels/AssetDetailPanel';
+import GalleryView from '../panels/GalleryView';
+import RightSidebar from '../panels/RightSidebar';
+import TimelineView from '../panels/TimelineView';
+import CategoryFilter from './CategoryFilter';
+import HUDControlBar from './HUDControlBar';
+import LoadingScreen from './LoadingScreen';
+import Logo from './Logo';
+import SearchBar from './SearchBar';
+
 export default function HUDOverlay() {
   return (
-    <div className="fixed inset-0 pointer-events-none z-10">
-      {/* Agent B: Add Logo, SearchBar, CategoryFilter, HUDControlBar, RightSidebar, AssetDetailPanel here */}
-      {/* Agent C: Add GalleryView, TimelineView here */}
+    <div className="pointer-events-none fixed inset-0 z-10 overflow-hidden">
+      <LoadingScreen />
+
+      <div className="absolute left-4 top-4 z-20">
+        <Logo />
+      </div>
+
+      <div className="absolute right-4 top-4 z-20 md:left-1/2 md:right-auto md:-translate-x-1/2">
+        <SearchBar />
+      </div>
+
+      <div className="absolute left-4 right-4 top-24 z-20 flex justify-center md:top-20">
+        <CategoryFilter />
+      </div>
+
+      <RightSidebar />
+      <AssetDetailPanel />
+
+      <div className="absolute bottom-4 left-0 right-0 z-20 px-4">
+        <HUDControlBar />
+      </div>
+
+      <GalleryView />
+      <TimelineView />
     </div>
   );
 }
