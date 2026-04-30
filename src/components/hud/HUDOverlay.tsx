@@ -1,5 +1,7 @@
 import AssetDetailPanel from '../panels/AssetDetailPanel';
+import GalleryView from '../panels/GalleryView';
 import RightSidebar from '../panels/RightSidebar';
+import TimelineView from '../panels/TimelineView';
 import CategoryFilter from './CategoryFilter';
 import HUDControlBar from './HUDControlBar';
 import LoadingScreen from './LoadingScreen';
@@ -29,6 +31,9 @@ export default function HUDOverlay() {
       <div className="absolute bottom-4 left-0 right-0 z-20 px-4">
         <HUDControlBar />
       </div>
+
+      <GalleryView />
+      <TimelineView />
     </div>
   );
 }

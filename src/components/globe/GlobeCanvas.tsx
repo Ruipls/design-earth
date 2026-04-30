@@ -1,5 +1,6 @@
-﻿import { Canvas } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { CAMERA, COLORS } from '../../lib/constants';
+import { useUIStore } from '../../stores/useUIStore';
 import Atmosphere from './Atmosphere';
 import CameraController from './CameraController';
 import CountryLabels from './CountryLabels';
@@ -13,8 +14,12 @@ import ZoomLevelManager from './ZoomLevelManager';
  * The main R3F Canvas wrapper. Always mounted, fills the entire viewport.
  */
 export default function GlobeCanvas() {
+  const viewMode = useUIStore((state) => state.viewMode);
+  const canvasModeClass =
+    viewMode === 'globe' ? 'is-globe-mode' : 'is-panel-mode';
+
   return (
-    <div className="fixed inset-0 h-full w-full touch-none">
+    <div className={`globe-canvas-shell touch-none ${canvasModeClass}`}>
       <Canvas
         camera={{
           position: [0, 0, CAMERA.INITIAL_DISTANCE],
