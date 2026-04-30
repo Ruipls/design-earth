@@ -33,7 +33,7 @@ export default function YearRangeSlider() {
         />
         <input
           aria-label="Minimum year"
-          className="absolute inset-0 h-8 w-full appearance-none bg-transparent accent-gold"
+          className="de-range-input absolute inset-0 h-8 w-full appearance-none bg-transparent accent-gold"
           max={MAX}
           min={MIN}
           onChange={(event) => {
@@ -46,7 +46,7 @@ export default function YearRangeSlider() {
         />
         <input
           aria-label="Maximum year"
-          className="absolute inset-0 h-8 w-full appearance-none bg-transparent accent-gold"
+          className="de-range-input absolute inset-0 h-8 w-full appearance-none bg-transparent accent-gold"
           max={MAX}
           min={MIN}
           onChange={(event) => {

@@ -49,6 +49,18 @@ button {
   color: inherit;
 }
 
+.de-range-input {
+  pointer-events: none;
+}
+
+.de-range-input::-webkit-slider-thumb {
+  pointer-events: auto;
+}
+
+.de-range-input::-moz-range-thumb {
+  pointer-events: auto;
+}
+
 .globe-canvas-shell {
   position: fixed;
   inset: 0;
