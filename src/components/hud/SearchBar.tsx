@@ -43,7 +43,7 @@ export default function SearchBar() {
 
   return (
     <div className="pointer-events-auto relative">
-      <HUDPanel className="hidden w-[min(34rem,42vw)] md:block">{input}</HUDPanel>
+      <HUDPanel className="hidden w-[280px] md:block">{input}</HUDPanel>
 
       <HUDButton
         aria-expanded={mobileOpen}
@@ -63,7 +63,7 @@ export default function SearchBar() {
 
       <HUDPanel
         className={cn(
-          'absolute right-0 top-12 w-[min(calc(100vw-2rem),22rem)] origin-top-right md:hidden',
+          'fixed left-4 right-4 top-20 origin-top-left md:hidden',
           'transition duration-200',
           mobileOpen
             ? 'translate-y-0 scale-100 opacity-100'

@@ -4,6 +4,7 @@ import { HUDKicker } from '../ui/hud';
 
 const MIN = YEAR_RANGE.MIN;
 const MAX = YEAR_RANGE.MAX;
+const DECADES = [1850, 1900, 1950, 2000, 2026];
 
 function toPercent(value: number) {
   return ((value - MIN) / (MAX - MIN)) * 100;
@@ -39,6 +40,7 @@ export default function YearRangeSlider() {
             const nextMin = Math.min(Number(event.target.value), maxYear - 1);
             setYearRange([nextMin, maxYear]);
           }}
+          step={1}
           type="range"
           value={minYear}
         />
@@ -51,9 +53,21 @@ export default function YearRangeSlider() {
             const nextMax = Math.max(Number(event.target.value), minYear + 1);
             setYearRange([minYear, nextMax]);
           }}
+          step={1}
           type="range"
           value={maxYear}
         />
+      </div>
+      <div className="relative mt-1 h-4 text-[0.62rem] tabular-nums text-ivory-muted/80">
+        {DECADES.map((year) => (
+          <span
+            className="absolute -translate-x-1/2"
+            key={year}
+            style={{ left: `${toPercent(year)}%` }}
+          >
+            {year}
+          </span>
+        ))}
       </div>
     </div>
   );

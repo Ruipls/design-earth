@@ -1,7 +1,5 @@
 import AssetDetailPanel from '../panels/AssetDetailPanel';
-import GalleryView from '../panels/GalleryView';
 import RightSidebar from '../panels/RightSidebar';
-import TimelineView from '../panels/TimelineView';
 import CategoryFilter from './CategoryFilter';
 import HUDControlBar from './HUDControlBar';
 import LoadingScreen from './LoadingScreen';
@@ -17,11 +15,11 @@ export default function HUDOverlay() {
         <Logo />
       </div>
 
-      <div className="absolute right-4 top-4 z-20 md:left-1/2 md:right-auto md:-translate-x-1/2">
+      <div className="absolute left-4 right-4 top-20 z-20 md:right-auto">
         <SearchBar />
       </div>
 
-      <div className="absolute left-4 right-4 top-24 z-20 flex justify-center md:top-20">
+      <div className="absolute left-4 right-4 top-[8.5rem] z-20 flex justify-start md:left-auto md:top-4 md:justify-end">
         <CategoryFilter />
       </div>
 
@@ -31,9 +29,6 @@ export default function HUDOverlay() {
       <div className="absolute bottom-4 left-0 right-0 z-20 px-4">
         <HUDControlBar />
       </div>
-
-      <GalleryView />
-      <TimelineView />
     </div>
   );
 }

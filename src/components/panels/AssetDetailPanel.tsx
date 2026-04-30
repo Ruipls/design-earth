@@ -32,7 +32,7 @@ export default function AssetDetailPanel() {
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center md:inset-y-0 md:left-auto md:right-0 md:items-stretch md:justify-end">
       <HUDPanel
         className={cn(
-          'pointer-events-auto flex max-h-[82vh] w-full max-w-[34rem] flex-col overflow-hidden rounded-b-none transition duration-300 md:h-full md:max-h-none md:rounded-l-lg md:rounded-r-none',
+          'pointer-events-auto flex max-h-[82vh] w-full flex-col overflow-hidden rounded-b-none transition duration-300 md:h-full md:max-h-none md:w-[420px] md:rounded-l-lg md:rounded-r-none',
           open
             ? 'translate-y-0 opacity-100 md:translate-x-0'
             : 'pointer-events-none translate-y-full opacity-0 md:translate-x-full md:translate-y-0',
@@ -60,6 +60,9 @@ export default function AssetDetailPanel() {
                 <h2 className="mt-2 text-2xl font-semibold leading-tight text-ivory">
                   {asset.name}
                 </h2>
+                <p className="mt-1 truncate text-sm text-ivory-muted">
+                  {asset.nameLocal} / {asset.nameZh}
+                </p>
               </div>
             </div>
 

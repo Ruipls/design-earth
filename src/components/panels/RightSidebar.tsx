@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { CATEGORY_COLORS, CATEGORY_LABELS } from '../../lib/constants';
 import { useAssetStore } from '../../stores/useAssetStore';
 import { useFilterStore } from '../../stores/useFilterStore';
+import { useGlobeStore } from '../../stores/useGlobeStore';
 import { useUIStore } from '../../stores/useUIStore';
 import type { DesignAsset } from '../../types/DesignAsset';
 import { formatAssetYear } from '../ui/assetFormat';
@@ -46,6 +47,8 @@ export default function RightSidebar() {
   const activeCategories = useFilterStore((s) => s.activeCategories);
   const yearRange = useFilterStore((s) => s.yearRange);
   const searchQuery = useFilterStore((s) => s.searchQuery);
+  const visibleAssetIds = useGlobeStore((s) => s.visibleAssetIds);
+  const setCameraTarget = useGlobeStore((s) => s.setCameraTarget);
   const sidebarExpanded = useUIStore((s) => s.sidebarExpanded);
   const selectedAssetId = useUIStore((s) => s.selectedAssetId);
   const toggleSidebar = useUIStore((s) => s.toggleSidebar);
@@ -56,48 +59,116 @@ export default function RightSidebar() {
     [activeCategories, assets, searchQuery, yearRange],
   );
 
+  const visibleAssets = useMemo(() => {
+    if (visibleAssetIds.length === 0) return filteredAssets;
+
+    const visible = new Set(visibleAssetIds);
+    return filteredAssets.filter((asset) => visible.has(asset.id));
+  }, [filteredAssets, visibleAssetIds]);
+
+  const countryRank = useMemo(() => {
+    const byCountry = new Map<
+      string,
+      { count: number; country: string; lat: number; lng: number }
+    >();
+
+    visibleAssets.forEach((asset) => {
+      const key = asset.countryCode || asset.country;
+      const current = byCountry.get(key) ?? {
+        count: 0,
+        country: asset.country,
+        lat: 0,
+        lng: 0,
+      };
+
+      current.count += 1;
+      current.lat += asset.latitude;
+      current.lng += asset.longitude;
+      byCountry.set(key, current);
+    });
+
+    return Array.from(byCountry.entries())
+      .map(([code, item]) => ({
+        code,
+        count: item.count,
+        country: item.country,
+        lat: item.lat / item.count,
+        lng: item.lng / item.count,
+      }))
+      .sort((a, b) => b.count - a.count || a.country.localeCompare(b.country))
+      .slice(0, 5);
+  }, [visibleAssets]);
+
   return (
-    <div className="pointer-events-none fixed right-4 top-24 z-30 flex max-h-[calc(100vh-11rem)] items-start gap-3 md:top-28">
+    <div className="pointer-events-none fixed inset-0 z-30">
       <HUDButton
         aria-expanded={sidebarExpanded}
         aria-label="Toggle asset index"
-        className="pointer-events-auto h-12 w-12 px-0"
+        className="pointer-events-auto fixed bottom-24 right-4 h-12 w-12 px-0 md:bottom-auto md:right-0 md:top-1/2 md:h-[120px] md:w-10 md:-translate-y-1/2 md:rounded-r-none"
         onClick={toggleSidebar}
         type="button"
       >
-        <span aria-hidden="true" className="text-lg leading-none">
+        <span aria-hidden="true" className="text-lg leading-none md:hidden">
+          {sidebarExpanded ? 'v' : '^'}
+        </span>
+        <span aria-hidden="true" className="hidden text-lg leading-none md:block">
           {sidebarExpanded ? '>' : '<'}
         </span>
       </HUDButton>
 
       <HUDPanel
         className={cn(
-          'pointer-events-auto flex h-[calc(100vh-11rem)] w-[min(calc(100vw-5.5rem),23rem)] flex-col overflow-hidden transition duration-300',
+          'pointer-events-auto fixed flex flex-col overflow-hidden transition duration-300',
+          'inset-x-0 bottom-0 max-h-[72vh] rounded-b-none md:inset-x-auto md:bottom-auto md:right-0 md:top-24 md:h-[calc(100vh-10rem)] md:w-80 md:rounded-l-lg md:rounded-r-none',
           sidebarExpanded
-            ? 'translate-x-0 opacity-100'
-            : 'pointer-events-none translate-x-6 opacity-0',
+            ? 'translate-y-0 opacity-100 md:translate-x-0'
+            : 'pointer-events-none translate-y-full opacity-0 md:translate-x-full md:translate-y-0',
         )}
       >
         <div className="border-b border-hud-border px-4 py-4">
-          <HUDKicker>Visible records</HUDKicker>
+          <HUDKicker>Viewport records</HUDKicker>
           <div className="mt-2 flex items-end justify-between gap-4">
             <h2 className="text-xl font-semibold tabular-nums">
-              {filteredAssets.length}
+              {visibleAssets.length}
             </h2>
             <p className="text-xs text-ivory-muted">
-              of {assets.length} loaded
+              {filteredAssets.length} filtered / {assets.length} loaded
             </p>
           </div>
         </div>
 
+        <div className="border-b border-hud-border px-4 py-3">
+          <HUDKicker>Countries</HUDKicker>
+          <div className="mt-3 space-y-2">
+            {countryRank.length === 0 ? (
+              <p className="text-xs text-ivory-muted">No countries in view.</p>
+            ) : (
+              countryRank.map((country) => (
+                <button
+                  className="flex w-full items-center justify-between rounded-md border border-hud-border bg-ink/25 px-3 py-2 text-left text-sm transition hover:border-gold/45 hover:bg-gold/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+                  key={country.code}
+                  onClick={() => setCameraTarget(country.lat, country.lng)}
+                  type="button"
+                >
+                  <span className="font-semibold text-ivory">{country.code}</span>
+                  <span className="min-w-0 flex-1 truncate px-3 text-ivory-muted">
+                    {country.country}
+                  </span>
+                  <span className="tabular-nums text-gold">{country.count}</span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+
         <div className="min-h-0 flex-1 overflow-y-auto p-2">
-          {filteredAssets.length === 0 ? (
+          {visibleAssets.length === 0 ? (
             <div className="grid h-full place-items-center px-6 text-center text-sm leading-6 text-ivory-muted">
               No records match the active HUD filters.
             </div>
           ) : (
             <div className="space-y-2">
-              {filteredAssets.map((asset) => {
+              {visibleAssets.map((asset) => {
                 const selected = asset.id === selectedAssetId;
 
                 return (
@@ -110,7 +181,10 @@ export default function RightSidebar() {
                         : 'border-hud-border bg-ink/30 hover:border-gold/35 hover:bg-gold/10',
                     )}
                     key={asset.id}
-                    onClick={() => selectAsset(asset.id)}
+                    onClick={() => {
+                      setCameraTarget(asset.latitude, asset.longitude);
+                      selectAsset(asset.id);
+                    }}
                     type="button"
                   >
                     <div className="flex items-start justify-between gap-3">
