@@ -87,6 +87,7 @@ export default function GalleryView() {
       className={`de-view-panel de-gallery-panel${isOpen ? ' is-open' : ''}`}
       data-viewport={viewportBand}
       aria-hidden={!isOpen}
+      inert={!isOpen}
     >
       <div className="de-panel-shell">
         <header className="de-panel-header">

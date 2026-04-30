@@ -49,6 +49,18 @@ button {
   color: inherit;
 }
 
+.de-range-input {
+  pointer-events: none;
+}
+
+.de-range-input::-webkit-slider-thumb {
+  pointer-events: none;
+}
+
+.de-range-input::-moz-range-thumb {
+  pointer-events: none;
+}
+
 .globe-canvas-shell {
   position: fixed;
   inset: 0;
@@ -490,7 +502,7 @@ button {
   }
 
   .de-panel-shell {
-    padding: 132px 16px 104px;
+    padding: 204px 16px 232px;
     border-left: 0;
     background: rgba(5, 8, 8, 0.96);
   }

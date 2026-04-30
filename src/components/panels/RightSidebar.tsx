@@ -60,8 +60,6 @@ export default function RightSidebar() {
   );
 
   const visibleAssets = useMemo(() => {
-    if (visibleAssetIds.length === 0) return filteredAssets;
-
     const visible = new Set(visibleAssetIds);
     return filteredAssets.filter((asset) => visible.has(asset.id));
   }, [filteredAssets, visibleAssetIds]);
@@ -182,7 +180,6 @@ export default function RightSidebar() {
                     )}
                     key={asset.id}
                     onClick={() => {
-                      setCameraTarget(asset.latitude, asset.longitude);
                       selectAsset(asset.id);
                     }}
                     type="button"
