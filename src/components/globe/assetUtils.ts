@@ -135,7 +135,12 @@ export function commitVisibleAssetIds(
   previousSignature: MutableRefObject<string>,
 ): void {
   const signature = ids.join('|');
-  if (signature !== previousSignature.current) {
+  const currentSignature = useGlobeStore.getState().visibleAssetIds.join('|');
+
+  if (
+    signature !== previousSignature.current ||
+    signature !== currentSignature
+  ) {
     previousSignature.current = signature;
     useGlobeStore.getState().setVisibleAssetIds(ids);
   }
