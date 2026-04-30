@@ -1,4 +1,4 @@
-﻿import { Canvas } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { CAMERA, COLORS } from '../../lib/constants';
 import Atmosphere from './Atmosphere';
 import CameraController from './CameraController';
