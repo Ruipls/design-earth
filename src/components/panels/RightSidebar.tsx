@@ -180,7 +180,6 @@ export default function RightSidebar() {
                     )}
                     key={asset.id}
                     onClick={() => {
-                      setCameraTarget(asset.latitude, asset.longitude);
                       selectAsset(asset.id);
                     }}
                     type="button"
