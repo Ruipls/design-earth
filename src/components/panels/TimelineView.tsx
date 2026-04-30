@@ -162,6 +162,7 @@ export default function TimelineView() {
       className={`de-view-panel de-timeline-panel${isOpen ? ' is-open' : ''}`}
       data-viewport={viewportBand}
       aria-hidden={!isOpen}
+      inert={!isOpen}
     >
       <div className="de-panel-shell">
         <header className="de-panel-header">
